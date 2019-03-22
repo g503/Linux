@@ -8,6 +8,11 @@ all:
 
 clean:
 	make -C /lib/modules/$(KVERSION)/build M=$(PWD) clean
-	rm test
+	sudo rmmod hello
+	sudo rm hello
 
+ins:
+	sudo insmod ./hello.ko
+	sudo mknod hello c 243 0
+	sudo chmod 666 /dev/helloDevName
 

@@ -22,11 +22,10 @@ static struct device* helloCharDevice = NULL;
 ssize_t hello_read(struct file *filep, char __user *outb, size_t nbytes, loff_t *offset)
 {
     int bytes_read = 0;
-
-   // unsigned long len;
-   // unsigned long ret = 0;
-   // size_t count = 0;
-
+/*
+    unsigned long len;
+    unsigned long ret;
+*/
     if (outb == NULL) {
         printk(KERN_INFO "hello_read: outb is NULL\n");
         return -EINVAL;
@@ -42,7 +41,7 @@ ssize_t hello_read(struct file *filep, char __user *outb, size_t nbytes, loff_t 
         return 0;
     }
 
-    printk(KERN_INFO "readCount = %02d, message %s", readCount, message);
+    printk(KERN_INFO "readCount = %02d, message %s\n", readCount, message);
     sprintf(number, "%02d\n", readCount++);
     strcpy(&message[strlen(message) - strlen(number)], number);
 
@@ -51,6 +50,9 @@ ssize_t hello_read(struct file *filep, char __user *outb, size_t nbytes, loff_t 
         (*offset)++;
         bytes_read++;
     }
+
+    return bytes_read;
+    
 /*
     if (bytes_read + 2 < nbytes) {
         put_user(' ', &outb[bytes_read]);
@@ -60,25 +62,31 @@ ssize_t hello_read(struct file *filep, char __user *outb, size_t nbytes, loff_t 
         }
 
     readCount++;
-*/
+
     return bytes_read;
-/*
+
     len = (nbytes > (num_bytes - *offset)) ? num_bytes - *offset : nbytes;
-    printk(KERN_INFO "hello_read: len is %lu\n", len);
+    printk(KERN_INFO "hello_read: len is %lu offset is %llu\n", len, *offset);
 
-    do {
-        ret = copy_to_user(outb, &message[*offset], len);
-    } while((count++ < 2000) && (ret == 0));
-    printk(KERN_INFO "hello_read: ret is %lu, count is %zu\n", ret, count);
+    ret = copy_to_user(outb, &message[*offset], len);
+    if (ret == 0) {
+        printk(KERN_INFO "hello_read: copy_to_user success\n");
+        num_bytes = 0;  // clear the position in message buffer
+        return 0;
+    }
 
-    return (ssize_t)ret;
-*/ 
+    printk(KERN_INFO "hello_read: failed to send %lu charakters to user\n", len);
+
+    return -EFAULT;
+*/    
 }
 
 ssize_t hello_write(struct file *filep, const char __user *extb, size_t nbytes, loff_t *offset)
 {
-    if ((extb == NULL) || (nbytes < 5)) {
-        printk(KERN_ALERT "Error - cannot handle write\n");
+    printk(KERN_INFO "hello_write nbytes=%zu \n", nbytes);
+
+    if ((extb == NULL) || (nbytes < 5) || (nbytes > (sizeof(message) - 20))){
+        printk(KERN_INFO "Error - cannot handle write, nbytes=%zu\n", nbytes);
         return -EINVAL;
         }
 

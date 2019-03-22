@@ -19,10 +19,13 @@ sudo tail -f /var/log/syslog
 sudo mknod hello c 243 0
 #243 to numer modułu odczytanego z punktu 3
 
-5. Czytanie:
-cat hello
-
-6. Zapis realizowany jest poprzez aplikacje test
+5. Czytanie i zapis
+Wersja 1.
+sudo chmod 666 /dev/helloDevName
+cat /dev/helloDevName
+sudo echo "Tu wpisujemy tekst do wyslania" > /dev/helloDevName
+Wersja 2.
+Zapis/odczyt realizowany jest poprzez aplikacje test
 sudo ./test
 
 Jak odinstalować i posprzątać
